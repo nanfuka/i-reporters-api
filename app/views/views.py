@@ -18,7 +18,7 @@ validators = Validators()
 @app.route('/')
 def index():
     """index url"""
-    return jsonify({"status": 201, "message": "hi welcome to ireporter"})
+    return jsonify({"status": 201, "message": "hi welcome to the ireporter"})
 
 
 @app.route('/api/v1/signup', methods=['POST'])
@@ -35,13 +35,32 @@ def signup():
     password = data.get('password')
     user = User()
 
+    invalid_user_input = validators.validate_strings(firstname, lastname, othernames, username, data)
+    if invalid_user_input:
+        return jsonify({"status": 400, 'error': invalid_user_input}), 400 
+    invalid_email = validators.validate_email(email)
+    if invalid_email:
+        return jsonify({"status": 400, 'error': invalid_email}), 400 
+    invalid_type = validators.validat_numbers(phoneNumber)
+    if invalid_type:
+        return jsonify({"status": 400, 'error': invalid_type}), 400 
+    validate_boolean = validators.validate_boolean(isAdmin)
+    if validate_boolean:
+        return jsonify({"status": 400, 'error': validate_boolean}), 400
+    validate_password = validators.validate_password(password)
+    if validate_password:
+        return jsonify({"status": 400, 'error': validate_boolean}), 400
+        
     invalid_detail = user.check_repitition(username, email, password)
-    error_message = validators.validate_user_details(firstname, lastname,
-                                                     email, username, password,
-                                                     phoneNumber, isAdmin,
-                                                     othernames)
-    if error_message:
-        return jsonify({"status": 400, 'error': error_message}), 400
+    if invalid_detail:
+        return jsonify({"status": 400, 'error': invalid_detail}), 400
+
+    # error_message = validators.validate_user_details(firstname, lastname,
+    #                                                  email, username, password,
+    #                                                  phoneNumber, isAdmin,
+    #                                                  othernames)
+    # if error_message:
+    #     return jsonify({"status": 400, 'error': error_message}), 400
     elif invalid_detail:
         return jsonify({"status": 400, 'error': invalid_detail}), 400
     else:
@@ -50,7 +69,7 @@ def signup():
             data['lastname'],
             data['othernames'],
             data['email'],
-            data['PhoneNumber'],
+            data['phoneNumber'],
             data['username'],
             data['isAdmin'],
             data['password'])
@@ -113,10 +132,14 @@ def create_redflags():
     error_message = validators.validate_input(
         createdby, incident_type, status)
     wrong_location = validators.validate_location(location)
+    validate_comment = validators.validate_coment(comment)
     if wrong_location:
         return jsonify({"status": 400, 'error': wrong_location}), 400
     elif error_message:
         return jsonify({"status": 400, 'error': error_message}), 400
+    elif validate_comment:
+        return jsonify({"status": 400, 'error': validate_comment}), 400
+
     new_incident = redflag.create_redflag(
         data['createdby'],
         data['incident_type'],

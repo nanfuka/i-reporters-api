@@ -1,5 +1,5 @@
 # from app.models.users import User
-from app.models.ti import Ti, users
+from app.models.users import Ti, users
 from flask import Flask, jsonify, request, json
 import re
 
@@ -50,4 +50,3 @@ class User():
                 return "password already exists, choose another one"
             elif len(password) < 4:
                 return "password strength is too weak"
-© 2019 GitHub, Inc.
